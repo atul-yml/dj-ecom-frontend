@@ -24,7 +24,6 @@ function getCsrfToken(): string {
   const value = `; ${document.cookie}`
   const parts = value.split(`; csrftoken=`)
   const token = parts.length === 2 ? (parts.pop()?.split(';').shift() ?? '') : ''
-  console.log('[CSRF] getCsrfToken:', { token, cookieLength: document.cookie.length })
   return token
 }
 // ─── State ────────────────────────────────────────────────────────────────────
@@ -103,13 +102,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     try {
       const csrfToken = getCsrfToken()
-      console.log('[Logout] Starting logout with CSRF token:', csrfToken ? 'present' : 'missing')
-      
       const result = await api.post("/auth/logout/", {}, {
         headers: { 'X-CSRFToken': csrfToken },
       })
       
-      console.log('[Logout] Backend response:', result)
     } catch (err) {
       console.error('[Logout] Error during logout:', err)
       // ignore network errors — still clear client state
